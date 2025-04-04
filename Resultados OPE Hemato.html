@@ -1,0 +1,1059 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados OPE Hematología</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding-bottom: 50px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--light-color);
+            margin-bottom: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .search-container {
+            flex: 1;
+            min-width: 100%;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        #searchInput {
+            width: 100%;
+            padding: 12px 10px 12px 35px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 15px;
+            -webkit-overflow-scrolling: touch; /* Para mejor desplazamiento en iOS */
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            white-space: nowrap;
+        }
+        
+        th:hover {
+            background-color: var(--dark-color);
+        }
+        
+        th i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Ajustes específicos para móvil */
+        @media (max-width: 600px) {
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9rem;
+            }
+            
+            th:nth-child(1), td:nth-child(1) {
+                width: 15%;
+                text-align: center;
+            }
+            
+            th:nth-child(3), td:nth-child(3) {
+                width: 25%;
+                text-align: right;
+            }
+            
+            th:nth-child(2), td:nth-child(2) {
+                width: 60%;
+            }
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .pagination button {
+            padding: 10px 12px;
+            border: none;
+            background-color: white;
+            color: var(--primary-color);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+            min-width: 40px;
+            font-size: 0.9rem;
+        }
+        
+        .pagination button:hover {
+            background-color: var(--light-color);
+        }
+        
+        .pagination button.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .stats {
+            margin: 15px 0;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            background-color: rgba(255, 230, 0, 0.3);
+            font-weight: bold;
+        }
+        
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            padding: 15px 0;
+            border-top: 1px solid #ddd;
+        }
+        
+        /* Mejoras específicas para móvil */
+        @media (max-width: 768px) {
+            .container {
+                padding: 8px;
+            }
+            
+            header {
+                padding: 12px 0;
+                margin-bottom: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 10px;
+            }
+            
+            .search-container, .filter-container {
+                width: 100%;
+            }
+            
+            .filter-container {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            
+            select {
+                width: 100%;
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .stats {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .pagination button {
+                padding: 8px;
+                min-width: 36px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Mejoras para pantallas muy pequeñas */
+        @media (max-width: 400px) {
+            .filter-container {
+                grid-template-columns: 1fr;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+                font-size: 0.85rem;
+            }
+            
+            .pagination {
+                gap: 3px;
+            }
+            
+            .pagination button {
+                padding: 8px 6px;
+                min-width: 32px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Indicador de desplazamiento horizontal */
+        .scroll-indicator {
+            display: none;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        
+        @media (max-width: 600px) {
+            .scroll-indicator {
+                display: block;
+            }
+        }
+        
+        /* Estilos para asegurar que la tabla se muestre correctamente en móvil */
+        .table-row {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .table-cell {
+            padding: 12px 8px;
+        }
+        
+        .table-cell.position {
+            width: 15%;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .table-cell.name {
+            width: 60%;
+        }
+        
+        .table-cell.score {
+            width: 25%;
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .table-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .table-header .table-cell {
+            cursor: pointer;
+        }
+        
+        .table-body .table-row:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .table-body .table-row:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Mensaje de carga */
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        /* Mensaje de no resultados */
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            font-size: 1rem;
+            color: var(--accent-color);
+        }
+        
+        /* Botón para volver arriba */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .back-to-top.visible {
+            opacity: 0.8;
+        }
+        
+        .back-to-top:hover {
+            opacity: 1;
+        }
+        
+        /* Estilo para la atribución */
+        .attribution {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Resultados OPE Hematología</h1>
+            <div class="subtitle">Listado de puntuaciones por orden de clasificación</div>
+        </header>
+        
+        <div class="controls">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Buscar por nombre...">
+            </div>
+            
+            <div class="filter-container">
+                <select id="puntuacionFilter">
+                    <option value="all">Todas las puntuaciones</option>
+                    <option value="45">≥ 45 puntos</option>
+                    <option value="40">≥ 40 puntos</option>
+                    <option value="35">≥ 35 puntos</option>
+                    <option value="30">≥ 30 puntos</option>
+                </select>
+                
+                <select id="entriesPerPage">
+                    <option value="10">10 por página</option>
+                    <option value="25">25 por página</option>
+                    <option value="50">50 por página</option>
+                    <option value="100">100 por página</option>
+                    <option value="all">Ver todos</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <i class="fas fa-arrows-left-right"></i> Desliza horizontalmente para ver toda la tabla
+        </div>
+        
+        <!-- Versión alternativa de tabla para móvil -->
+        <div id="mobileTable" class="table-container">
+            <div class="table-header table-row">
+                <div class="table-cell position" data-sort="posicion">Pos. <i class="fas fa-sort"></i></div>
+                <div class="table-cell name" data-sort="nombre">Nombre <i class="fas fa-sort"></i></div>
+                <div class="table-cell score" data-sort="puntuacion">Puntos <i class="fas fa-sort"></i></div>
+            </div>
+            <div class="table-body" id="tableBody">
+                <!-- Los datos se cargarán dinámicamente con JavaScript -->
+                <div class="loading">Cargando resultados...</div>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <!-- Los botones de paginación se generarán dinámicamente -->
+        </div>
+        
+        <div class="stats" id="stats">
+            <!-- Estadísticas se mostrarán aquí -->
+        </div>
+        
+        <div class="attribution">
+            Desarrollado por Gonzalo D
+        </div>
+    </div>
+    
+    <footer>
+        <p>Resultados OPE Hematología - Fecha de actualización: 4 de abril de 2025</p>
+    </footer>
+    
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+    
+    <script>
+        // Datos de los resultados
+        const resultados = [
+            { posicion: 1, nombre: "CARREÑO GOMEZ-TARRAGONA, GONZALO", puntuacion: 46.941 },
+            { posicion: 2, nombre: "JIMENEZ UBIETO, ANA ISABEL", puntuacion: 45.192 },
+            { posicion: 3, nombre: "TENORIO NUÑEZ, MARIA CONCEPCION", puntuacion: 44.755 },
+            { posicion: 4, nombre: "GARCIA RAMIREZ, PATRICIA", puntuacion: 44.406 },
+            { posicion: 5, nombre: "GONZALEZ GASCON Y MARIN, ISABEL TERESA", puntuacion: 44.318 },
+            { posicion: 6, nombre: "LANDETE HERNANDEZ, ELENA", puntuacion: 43.881 },
+            { posicion: 7, nombre: "MEIJON ORTIGUEIRA, MARIA DEL MAR", puntuacion: 43.881 },
+            { posicion: 8, nombre: "BUENDIA UREÑA, BUENAVENTURA", puntuacion: 43.444 },
+            { posicion: 9, nombre: "DA SILVA RODRIGUEZ, CAROLINA MARIA", puntuacion: 43.444 },
+            { posicion: 10, nombre: "ORTIZ MARTIN, JAVIER", puntuacion: 43.444 },
+            { posicion: 11, nombre: "GOMEZ PRIETO, PILAR", puntuacion: 43.094 },
+            { posicion: 12, nombre: "DE LA CRUZ BENITO, BEATRIZ", puntuacion: 43.007 },
+            { posicion: 13, nombre: "SANCHEZ VADILLO, IRENE", puntuacion: 43.007 },
+            { posicion: 14, nombre: "SANZ RUPEREZ, ALEJANDRO", puntuacion: 43.007 },
+            { posicion: 15, nombre: "MARQUET PALOMANES, JUAN", puntuacion: 42.482 },
+            { posicion: 16, nombre: "ALONSO FERNANDEZ, RAFAEL ALBERTO", puntuacion: 42.308 },
+            { posicion: 17, nombre: "SANCHEZ PINA, JOSE MARIA", puntuacion: 42.133 },
+            { posicion: 18, nombre: "LORENZO JAMBRINA, ALICIA", puntuacion: 41.346 },
+            { posicion: 19, nombre: "RODRIGUEZ GAMBARTE, JUAN DIEGO", puntuacion: 41.346 },
+            { posicion: 20, nombre: "GALAN VEGA, JACOBO", puntuacion: 41.259 },
+            { posicion: 21, nombre: "VICUÑA ANDRES, ISABEL", puntuacion: 41.259 },
+            { posicion: 22, nombre: "MARTIN MORO, FERNANDO", puntuacion: 41.171 },
+            { posicion: 23, nombre: "ROLDAN PEREZ, ALICIA", puntuacion: 41.084 },
+            { posicion: 24, nombre: "MARTIN RODRIGUEZ, LUCIA", puntuacion: 40.996 },
+            { posicion: 25, nombre: "ACEDO DOMINGUEZ, NATALIA", puntuacion: 40.647 },
+            { posicion: 26, nombre: "ABALO PEREZ, LORENA", puntuacion: 40.559 },
+            { posicion: 27, nombre: "PIRIS VILLAESPESA, MIGUEL", puntuacion: 40.559 },
+            { posicion: 28, nombre: "MICHAEL FERNANDEZ, BERTA MERCEDES", puntuacion: 40.472 },
+            { posicion: 29, nombre: "VILCHES MORENO, ALBA SARA", puntuacion: 40.472 },
+            { posicion: 30, nombre: "VELAZQUEZ KENNEDY, KYRA", puntuacion: 40.21 },
+            { posicion: 31, nombre: "BAILEN ALMOROX, REBECA", puntuacion: 39.948 },
+            { posicion: 32, nombre: "DOS SANTOS ORTAS, ABEL", puntuacion: 39.948 },
+            { posicion: 33, nombre: "BAILE GONZALEZ, MONICA", puntuacion: 39.773 },
+            { posicion: 34, nombre: "ROMERO FERNANDEZ, ESPERANZA", puntuacion: 39.685 },
+            { posicion: 35, nombre: "GARCIA SANCHEZ, CRISTINA", puntuacion: 39.598 },
+            { posicion: 36, nombre: "JIMENEZ MARTIN, ANA", puntuacion: 39.51 },
+            { posicion: 37, nombre: "VILLAFUERTE GUTIERREZ, PAOLA SANDRA", puntuacion: 39.336 },
+            { posicion: 38, nombre: "NAVAS ELORZA, BEGOÑA", puntuacion: 39.161 },
+            { posicion: 39, nombre: "TORAL IBARRA, DENNISSE SHARON", puntuacion: 39.161 },
+            { posicion: 40, nombre: "GIL PEREZ, ANGELA", puntuacion: 39.073 },
+            { posicion: 41, nombre: "QUIROZ CERVANTES, KEINA SUSANA", puntuacion: 39.073 },
+            { posicion: 42, nombre: "GUTIERREZ JOMARRON, IRMA ISABEL", puntuacion: 38.899 },
+            { posicion: 43, nombre: "LOPEZ MUÑOZ, MARIA DE LAS NIEVES", puntuacion: 38.636 },
+            { posicion: 44, nombre: "ORDUNA ARNAL, MARIA TERESA", puntuacion: 38.636 },
+            { posicion: 45, nombre: "PARRILLA NAVAMUEL, LAURA", puntuacion: 38.636 },
+            { posicion: 46, nombre: "MARTINEZ FERNANDEZ, RAQUEL", puntuacion: 38.374 },
+            { posicion: 47, nombre: "ZAFRA TORRES, DENIS", puntuacion: 38.199 },
+            { posicion: 48, nombre: "LUCEA GALLEGO, IRENE", puntuacion: 38.024 },
+            { posicion: 49, nombre: "GASIOR KABAT, MERCEDES", puntuacion: 37.937 },
+            { posicion: 50, nombre: "ARRUGA MANZANO, ANA MARIA", puntuacion: 37.85 },
+            { posicion: 51, nombre: "MARTINEZ MUÑOZ, MARIA ESTHER", puntuacion: 37.85 },
+            { posicion: 52, nombre: "CUBILLAS GARCIA DE LA TORRE, DAMIAN", puntuacion: 37.762 },
+            { posicion: 53, nombre: "DE SOTO ALVAREZ, TERESA", puntuacion: 37.762 },
+            { posicion: 54, nombre: "BENZO CALLEJO, GONZALO", puntuacion: 37.5 },
+            { posicion: 55, nombre: "TORRES TIENZA, ANA", puntuacion: 37.5 },
+            { posicion: 56, nombre: "HUMALA BARBIER, KAREM KATUSHKA", puntuacion: 37.413 },
+            { posicion: 57, nombre: "REGALADO ARTAMENDI, ISABEL", puntuacion: 37.413 },
+            { posicion: 58, nombre: "GONZALEZ SALINAS, ANA MARIA", puntuacion: 37.325 },
+            { posicion: 59, nombre: "GOYANES MARTIN, MARIA ISABEL", puntuacion: 37.238 },
+            { posicion: 60, nombre: "ESCOLANO ESCOBAR, CRISTIAN", puntuacion: 37.15 },
+            { posicion: 61, nombre: "MUÑOZ LINARES, CRISTINA", puntuacion: 37.15 },
+            { posicion: 62, nombre: "ALARCON TOMAS, ANA", puntuacion: 36.888 },
+            { posicion: 63, nombre: "FABRA, MARTA", puntuacion: 36.888 },
+            { posicion: 64, nombre: "FLORES BALLESTER, ELENA", puntuacion: 36.888 },
+            { posicion: 65, nombre: "REVILLA CALVO, NURIA", puntuacion: 36.888 },
+            { posicion: 66, nombre: "LARIO ARRIBAS, ANA", puntuacion: 36.713 },
+            { posicion: 67, nombre: "BENGOCHEA CASADO, MARIA LUISA", puntuacion: 36.451 },
+            { posicion: 68, nombre: "GARCIA PEREZ, EDUARDO", puntuacion: 36.451 },
+            { posicion: 69, nombre: "GARCIA LEON, NATALIA", puntuacion: 35.927 },
+            { posicion: 70, nombre: "LUTS KHOROZ, IRYNA", puntuacion: 35.927 },
+            { posicion: 71, nombre: "MEDINA SALAZAR, SISSY FIORELLA", puntuacion: 35.839 },
+            { posicion: 72, nombre: "GUTIERREZ ALVARIÑO, M. DEL MAR", puntuacion: 35.752 },
+            { posicion: 73, nombre: "CONDE ROYO, DIEGO", puntuacion: 35.664 },
+            { posicion: 74, nombre: "ROMERA MARTINEZ, IRENE", puntuacion: 35.664 },
+            { posicion: 75, nombre: "PEREZ ORTEGA, ALBA", puntuacion: 35.577 },
+            { posicion: 76, nombre: "JIMENEZ ROLANDO, MARTA", puntuacion: 35.489 },
+            { posicion: 77, nombre: "DIAZ GOIZUETA, MARIA DEL MAR", puntuacion: 35.315 },
+            { posicion: 78, nombre: "CABERO MARTINEZ, ALMUDENA", puntuacion: 35.227 },
+            { posicion: 79, nombre: "SAEZ MARIN, ADOLFO JESUS", puntuacion: 35.14 },
+            { posicion: 80, nombre: "PADILLA CONEJO, IRENE", puntuacion: 35.052 },
+            { posicion: 81, nombre: "LORZA GIL, LEYRE", puntuacion: 34.878 },
+            { posicion: 82, nombre: "LUNA DE ABIA, ALEJANDRO", puntuacion: 34.703 },
+            { posicion: 83, nombre: "CACERES HERNANDEZ, SARA", puntuacion: 34.615 },
+            { posicion: 84, nombre: "GUIJARRO MONTORO, SONIA", puntuacion: 34.353 },
+            { posicion: 85, nombre: "PEREZ MARTINEZ, MARIA DEL CARMEN", puntuacion: 34.353 },
+            { posicion: 86, nombre: "MORALES DE LA PLAZA, ANA", puntuacion: 34.178 },
+            { posicion: 87, nombre: "NUEVO LOPEZ, MARIA IRENE", puntuacion: 33.916 },
+            { posicion: 88, nombre: "RAMIREZ LOPEZ, ANDRES", puntuacion: 33.829 },
+            { posicion: 89, nombre: "MONSALVO SAORNIL, SILVIA", puntuacion: 33.654 },
+            { posicion: 90, nombre: "ZUBICARAY SALEGUI, JOSUNE", puntuacion: 33.654 },
+            { posicion: 91, nombre: "MENENDEZ CUEVAS, MARINA", puntuacion: 33.479 },
+            { posicion: 92, nombre: "ALBA URDIALES, NATALIA", puntuacion: 33.392 },
+            { posicion: 93, nombre: "BIENERT GARCIA, ALVARO", puntuacion: 33.392 },
+            { posicion: 94, nombre: "FERNANDEZ MAQUEDA, CRISTINA TERESA", puntuacion: 33.392 },
+            { posicion: 95, nombre: "GOMEZ CRESPO, MARIA JOSEFA", puntuacion: 33.392 },
+            { posicion: 96, nombre: "CONDORI ARENAS, MYRNA HILDA", puntuacion: 32.955 },
+            { posicion: 97, nombre: "DE NICOLAS SOL, RODRIGO", puntuacion: 32.955 },
+            { posicion: 98, nombre: "GOMEZ ROJAS, SANDRA", puntuacion: 32.955 },
+            { posicion: 99, nombre: "BOLAÑOS CALDERON, ESTEFANIA", puntuacion: 32.867 },
+            { posicion: 100, nombre: "ROSADO SIERRA, MARIA BELEN", puntuacion: 32.78 },
+            { posicion: 101, nombre: "BENEITEZ FERNANDEZ, ANGELA", puntuacion: 32.517 },
+            { posicion: 102, nombre: "JUAREZ SALCEDO, LUIS MIGUEL", puntuacion: 32.255 },
+            { posicion: 103, nombre: "MARIN MORI, KAREN DEL CARMEN", puntuacion: 32.168 },
+            { posicion: 104, nombre: "CARDOS GOMEZ, VIRGINIA", puntuacion: 31.993 },
+            { posicion: 105, nombre: "GUILLEN RIENDA, CAROLINA", puntuacion: 31.294 },
+            { posicion: 106, nombre: "ALVAREZ JUAREZ, MIGUEL ANGEL", puntuacion: 31.206 },
+            { posicion: 107, nombre: "ORDOÑEZ GARCIA, MARIA", puntuacion: 31.031 },
+            { posicion: 108, nombre: "REGUILON GALLEGO, LAURA", puntuacion: 30.332 },
+            { posicion: 109, nombre: "SOLAN BLANCO, LAURA", puntuacion: 29.982 },
+            { posicion: 110, nombre: "MARCHECO PUPO, ERIEL ALEXIS", puntuacion: 29.895 },
+            { posicion: 111, nombre: "LLORENTE GONZALEZ, LAURA", puntuacion: 29.545 },
+            { posicion: 112, nombre: "VICENTE AYUSO, MARIA DEL CARMEN", puntuacion: 29.545 },
+            { posicion: 113, nombre: "YUMI GOMEZ, GABRIELA MIKYO", puntuacion: 29.545 },
+            { posicion: 114, nombre: "MARIN SAUCEDO, ALEJANDRO", puntuacion: 29.458 },
+            { posicion: 115, nombre: "PENALVA MORENO, MARIA JOSE", puntuacion: 29.458 },
+            { posicion: 116, nombre: "SEBASTIAN PEREZ, ELENA", puntuacion: 29.371 },
+            { posicion: 117, nombre: "LOPEZ GONZALEZ, SANDRA", puntuacion: 28.934 },
+            { posicion: 118, nombre: "VERA GUERRERO, ELENA", puntuacion: 28.671 },
+            { posicion: 119, nombre: "DAZA POZO, SONIA", puntuacion: 28.234 },
+            { posicion: 120, nombre: "PEREZ SEGURA, GLORIA MARIA", puntuacion: 27.448 },
+            { posicion: 121, nombre: "FRANGANILLO SUAREZ, AIDA", puntuacion: 27.273 },
+            { posicion: 122, nombre: "LOPEZ RIÑON, MONICA MARIA", puntuacion: 27.185 },
+            { posicion: 123, nombre: "IGLESIAS DEL BARRIO, ANA", puntuacion: 26.573 },
+            { posicion: 124, nombre: "PEREZ CALLE, GUILLERMO", puntuacion: 26.573 },
+            { posicion: 125, nombre: "LOPEZ-ANGLADA FERNANDEZ, LUCIA", puntuacion: 25.962 },
+            { posicion: 126, nombre: "RIVAS POLLMAR, MARIA ISABEL", puntuacion: 25.874 },
+            { posicion: 127, nombre: "RUIZ ZAMORANO, MAGDALENA CARMEN", puntuacion: 25.874 },
+            { posicion: 128, nombre: "QUESADA SANCHEZ, MARINA", puntuacion: 25.262 },
+            { posicion: 129, nombre: "ESPINOSA LARA, NATALIA", puntuacion: 24.738 },
+            { posicion: 130, nombre: "CAÑAS DE DIOS, LETICIA E", puntuacion: 22.465 }
+        ];
+        
+        // Variables globales
+        let currentPage = 1;
+        let entriesPerPage = 10;
+        let filteredResults = [...resultados];
+        let sortColumn = 'posicion';
+        let sortDirection = 'asc';
+        
+        // Elementos DOM
+        const tableBody = document.getElementById('tableBody');
+        const paginationContainer = document.getElementById('pagination');
+        const statsContainer = document.getElementById('stats');
+        const searchInput = document.getElementById('searchInput');
+        const puntuacionFilter = document.getElementById('puntuacionFilter');
+        const entriesSelect = document.getElementById('entriesPerPage');
+        const tableHeaders = document.querySelectorAll('.table-cell[data-sort]');
+        const backToTopButton = document.getElementById('backToTop');
+        
+        // Detectar si es un dispositivo móvil
+        const isMobile = window.innerWidth <= 768;
+        
+        // Inicializar la tabla
+        function initTable() {
+            // Eliminar mensaje de carga
+            tableBody.innerHTML = '';
+            
+            // Configurar eventos
+            searchInput.addEventListener('input', handleSearch);
+            puntuacionFilter.addEventListener('change', handleFilter);
+            entriesSelect.addEventListener('change', handleEntriesChange);
+            
+            // Configurar ordenación
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.getAttribute('data-sort');
+                    handleSort(column);
+                });
+            });
+            
+            // Configurar botón de volver arriba
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTopButton.classList.add('visible');
+                } else {
+                    backToTopButton.classList.remove('visible');
+                }
+            });
+            
+            backToTopButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Ajustar para móvil
+            if (isMobile) {
+                // Establecer un valor predeterminado más adecuado para móviles
+                entriesSelect.value = "10";
+                entriesPerPage = 10;
+            }
+            
+            // Cargar datos iniciales
+            applyFilters();
+            renderTable();
+            updatePagination();
+            updateStats();
+        }
+        
+        // Manejar búsqueda
+        function handleSearch() {
+            currentPage = 1;
+            applyFilters();
+            renderTable();
+            updatePagination();
+            updateStats();
+        }
+        
+        // Manejar filtro de puntuación
+        function handleFilter() {
+            currentPage = 1;
+            applyFilters();
+            renderTable();
+            updatePagination();
+            updateStats();
+        }
+        
+        // Manejar cambio en entradas por página
+        function handleEntriesChange() {
+            const value = entriesSelect.value;
+            entriesPerPage = value === 'all' ? filteredResults.length : parseInt(value);
+            currentPage = 1;
+            renderTable();
+            updatePagination();
+        }
+        
+        // Manejar ordenación
+        function handleSort(column) {
+            // Si es la misma columna, invertir dirección
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+            
+            // Actualizar iconos de ordenación
+            updateSortIcons();
+            
+            // Ordenar y renderizar
+            applySort();
+            renderTable();
+        }
+        
+        // Actualizar iconos de ordenación
+        function updateSortIcons() {
+            tableHeaders.forEach(header => {
+                const column = header.getAttribute('data-sort');
+                const icon = header.querySelector('i');
+                
+                if (column === sortColumn) {
+                    icon.className = sortDirection === 'asc' 
+                        ? 'fas fa-sort-up' 
+                        : 'fas fa-sort-down';
+                } else {
+                    icon.className = 'fas fa-sort';
+                }
+            });
+        }
+        
+        // Aplicar filtros
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const puntuacionValue = puntuacionFilter.value;
+            
+            filteredResults = resultados.filter(result => {
+                // Filtro de búsqueda
+                const matchesSearch = searchTerm === '' || 
+                    result.nombre.toLowerCase().includes(searchTerm);
+                
+                // Filtro de puntuación
+                let matchesPuntuacion = true;
+                if (puntuacionValue !== 'all') {
+                    const minPuntuacion = parseFloat(puntuacionValue);
+                    matchesPuntuacion = result.puntuacion >= minPuntuacion;
+                }
+                
+                return matchesSearch && matchesPuntuacion;
+            });
+            
+            applySort();
+        }
+        
+        // Aplicar ordenación
+        function applySort() {
+            filteredResults.sort((a, b) => {
+                let valueA = a[sortColumn];
+                let valueB = b[sortColumn];
+                
+                // Convertir a números si es necesario
+                if (sortColumn === 'posicion' || sortColumn === 'puntuacion') {
+                    valueA = parseFloat(valueA);
+                    valueB = parseFloat(valueB);
+                }
+                
+                // Ordenar
+                if (valueA < valueB) {
+                    return sortDirection === 'asc' ? -1 : 1;
+                }
+                if (valueA > valueB) {
+                    return sortDirection === 'asc' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        
+        // Renderizar tabla
+        function renderTable() {
+            tableBody.innerHTML = '';
+            
+            if (filteredResults.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'no-results';
+                noResults.textContent = 'No se encontraron resultados';
+                tableBody.appendChild(noResults);
+                return;
+            }
+            
+            const startIndex = (currentPage - 1) * entriesPerPage;
+            const endIndex = Math.min(startIndex + entriesPerPage, filteredResults.length);
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                const result = filteredResults[i];
+                const row = document.createElement('div');
+                row.className = 'table-row';
+                
+                // Celda de posición
+                const posicionCell = document.createElement('div');
+                posicionCell.className = 'table-cell position';
+                posicionCell.textContent = result.posicion;
+                row.appendChild(posicionCell);
+                
+                // Celda de nombre
+                const nombreCell = document.createElement('div');
+                nombreCell.className = 'table-cell name';
+                
+                // Truncar nombres largos en móvil y añadir funcionalidad para expandir
+                let nombreText = result.nombre;
+                if (window.innerWidth <= 600 && nombreText.length > 20) {
+                    nombreCell.setAttribute('data-full-text', nombreText);
+                    nombreText = nombreText.substring(0, 18) + '...';
+                    nombreCell.setAttribute('data-expanded', 'false');
+                    
+                    // Añadir evento para expandir/contraer
+                    nombreCell.addEventListener('click', function() {
+                        const isExpanded = this.getAttribute('data-expanded') === 'true';
+                        if (isExpanded) {
+                            this.innerHTML = this.getAttribute('data-full-text').substring(0, 18) + '...';
+                            if (searchTerm && this.getAttribute('data-full-text').toLowerCase().includes(searchTerm)) {
+                                highlightSearchTerm(this, searchTerm);
+                            }
+                            this.setAttribute('data-expanded', 'false');
+                        } else {
+                            this.innerHTML = this.getAttribute('data-full-text');
+                            if (searchTerm && this.getAttribute('data-full-text').toLowerCase().includes(searchTerm)) {
+                                highlightSearchTerm(this, searchTerm);
+                            }
+                            this.setAttribute('data-expanded', 'true');
+                        }
+                    });
+                }
+                
+                if (searchTerm && result.nombre.toLowerCase().includes(searchTerm)) {
+                    nombreCell.innerHTML = nombreText;
+                    highlightSearchTerm(nombreCell, searchTerm);
+                } else {
+                    nombreCell.textContent = nombreText;
+                }
+                
+                row.appendChild(nombreCell);
+                
+                // Celda de puntuación
+                const puntuacionCell = document.createElement('div');
+                puntuacionCell.className = 'table-cell score';
+                puntuacionCell.textContent = result.puntuacion.toFixed(3);
+                row.appendChild(puntuacionCell);
+                
+                tableBody.appendChild(row);
+            }
+        }
+        
+        // Resaltar término de búsqueda
+        function highlightSearchTerm(element, searchTerm) {
+            const innerHTML = element.innerHTML;
+            const index = innerHTML.toLowerCase().indexOf(searchTerm.toLowerCase());
+            if (index >= 0) {
+                const beforeMatch = innerHTML.substring(0, index);
+                const match = innerHTML.substring(index, index + searchTerm.length);
+                const afterMatch = innerHTML.substring(index + searchTerm.length);
+                element.innerHTML = beforeMatch + '<span class="highlight">' + match + '</span>' + afterMatch;
+            }
+        }
+        
+        // Actualizar paginación
+        function updatePagination() {
+            paginationContainer.innerHTML = '';
+            
+            if (filteredResults.length <= entriesPerPage) {
+                return;
+            }
+            
+            const totalPages = Math.ceil(filteredResults.length / entriesPerPage);
+            
+            // Botón anterior
+            const prevButton = document.createElement('button');
+            prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTable();
+                    updatePagination();
+                }
+            });
+            paginationContainer.appendChild(prevButton);
+            
+            // Botones de página
+            let maxVisiblePages = window.innerWidth <= 400 ? 3 : (window.innerWidth <= 768 ? 4 : 5);
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+            
+            // Primera página
+            if (startPage > 1) {
+                const firstButton = document.createElement('button');
+                firstButton.textContent = '1';
+                firstButton.addEventListener('click', () => {
+                    currentPage = 1;
+                    renderTable();
+                    updatePagination();
+                });
+                paginationContainer.appendChild(firstButton);
+                
+                if (startPage > 2) {
+                    const ellipsis = document.createElement('button');
+                    ellipsis.textContent = '...';
+                    ellipsis.disabled = true;
+                    paginationContainer.appendChild(ellipsis);
+                }
+            }
+            
+            // Páginas visibles
+            for (let i = startPage; i <= endPage; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.className = i === currentPage ? 'active' : '';
+                pageButton.addEventListener('click', () => {
+                    currentPage = i;
+                    renderTable();
+                    updatePagination();
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+            
+            // Última página
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement('button');
+                    ellipsis.textContent = '...';
+                    ellipsis.disabled = true;
+                    paginationContainer.appendChild(ellipsis);
+                }
+                
+                const lastButton = document.createElement('button');
+                lastButton.textContent = totalPages;
+                lastButton.addEventListener('click', () => {
+                    currentPage = totalPages;
+                    renderTable();
+                    updatePagination();
+                });
+                paginationContainer.appendChild(lastButton);
+            }
+            
+            // Botón siguiente
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTable();
+                    updatePagination();
+                }
+            });
+            paginationContainer.appendChild(nextButton);
+        }
+        
+        // Actualizar estadísticas
+        function updateStats() {
+            const startIndex = (currentPage - 1) * entriesPerPage + 1;
+            const endIndex = Math.min(startIndex + entriesPerPage - 1, filteredResults.length);
+            
+            if (filteredResults.length === 0) {
+                statsContainer.textContent = 'No se encontraron resultados';
+                return;
+            }
+            
+            // En móvil, mostrar estadísticas en varias líneas
+            if (window.innerWidth <= 768) {
+                statsContainer.innerHTML = `Mostrando ${startIndex} a ${endIndex}<br>de ${filteredResults.length} resultados`;
+                
+                if (filteredResults.length > 0) {
+                    const maxPuntuacion = Math.max(...filteredResults.map(r => r.puntuacion));
+                    const minPuntuacion = Math.min(...filteredResults.map(r => r.puntuacion));
+                    const avgPuntuacion = filteredResults.reduce((sum, r) => sum + r.puntuacion, 0) / filteredResults.length;
+                    
+                    statsContainer.innerHTML += `<br>Máx: ${maxPuntuacion.toFixed(3)} | Mín: ${minPuntuacion.toFixed(3)}<br>Promedio: ${avgPuntuacion.toFixed(3)}`;
+                }
+            } else {
+                statsContainer.textContent = `Mostrando ${startIndex} a ${endIndex} de ${filteredResults.length} resultados`;
+                
+                if (filteredResults.length > 0) {
+                    const maxPuntuacion = Math.max(...filteredResults.map(r => r.puntuacion));
+                    const minPuntuacion = Math.min(...filteredResults.map(r => r.puntuacion));
+                    const avgPuntuacion = filteredResults.reduce((sum, r) => sum + r.puntuacion, 0) / filteredResults.length;
+                    
+                    statsContainer.textContent += ` | Puntuación máxima: ${maxPuntuacion.toFixed(3)} | Puntuación mínima: ${minPuntuacion.toFixed(3)} | Promedio: ${avgPuntuacion.toFixed(3)}`;
+                }
+            }
+        }
+        
+        // Ajustar la interfaz cuando cambia el tamaño de la ventana
+        window.addEventListener('resize', function() {
+            // Actualizar la interfaz
+            updatePagination();
+            updateStats();
+            
+            // Volver a renderizar la tabla para aplicar truncamiento de texto
+            renderTable();
+        });
+        
+        // Iniciar la aplicación cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initTable);
+        
+        // Iniciar inmediatamente para evitar retrasos
+        initTable();
+    </script>
+</body>
+</html>
